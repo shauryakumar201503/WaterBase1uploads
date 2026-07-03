@@ -6,20 +6,21 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// CHANGE 1: uploads → download
+// Use "download" folder for file storage
 const uploadFolder = path.join(__dirname, "download");
 if (!fs.existsSync(uploadFolder)) {
   fs.mkdirSync(uploadFolder);
 }
 
+// Multer storage system
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // CHANGE 2: uploads → download
     cb(null, uploadFolder);
   },
   filename: (req, file, cb) => {
@@ -29,9 +30,14 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// Data file
 const DATA_FILE = path.join(__dirname, "data.json");
 
+// Load and save data
 function loadData() {
+  if (!fs.existsSync(DATA_FILE)) {
+    fs.writeFileSync(DATA_FILE, "{}");
+  }
   return JSON.parse(fs.readFileSync(DATA_FILE));
 }
 
@@ -39,10 +45,9 @@ function saveData(data) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
+// UPLOAD ROUTE
 app.post("/upload", upload.single("file"), (req, res) => {
-  const password = req.body.password;
-  const username = req.body.username;
-  const siteName = req.body.siteName;
+  const { password, username, siteName } = req.body;
   const file = req.file;
 
   if (!file || !password || !username || !siteName) {
@@ -56,28 +61,31 @@ app.post("/upload", upload.single("file"), (req, res) => {
   data[id] = {
     filename: file.filename,
     originalName: file.originalname,
-    password: password,
-    username: username,
-    siteName: siteName,
-    uploadNumber: uploadNumber,
+    password,
+    username,
+    siteName,
+    uploadNumber,
     unlocked: false
   };
 
   saveData(data);
 
+  // FINAL URL FORMAT WITH ID INCLUDED
   const specialURL =
-    `/file/${file.filename}/${username}/${uploadNumber}/developershauryakumar`;
+    `/file/${id}/${file.filename}/${username}/${uploadNumber}/developershauryakumar`;
 
   res.json({ success: true, url: specialURL });
 });
 
-app.get("/file/:filename/:username/:uploadNumber/developershauryakumar", (req, res) => {
+// UNLOCK PAGE ROUTE
+app.get("/file/:id/:filename/:username/:uploadNumber/developershauryakumar", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "unlock.html"));
 });
 
+// UNLOCK API
 app.post("/unlock/:id", (req, res) => {
   const id = req.params.id;
-  const password = req.body.password;
+  const { password } = req.body;
 
   const data = loadData();
 
@@ -94,6 +102,7 @@ app.post("/unlock/:id", (req, res) => {
   res.json({ success: false, message: "Wrong password" });
 });
 
+// DOWNLOAD ROUTE
 app.get("/download/:id", (req, res) => {
   const id = req.params.id;
   const data = loadData();
@@ -106,11 +115,16 @@ app.get("/download/:id", (req, res) => {
     return res.send("You must unlock the file first");
   }
 
-  // CHANGE 3: uploads → download
   const filePath = path.join(uploadFolder, data[id].filename);
+
+  if (!fs.existsSync(filePath)) {
+    return res.send("File missing on server");
+  }
+
   res.download(filePath, data[id].originalName);
 });
 
+// START SERVER
 app.listen(PORT, () => {
   console.log("WaterBase running on port " + PORT);
 });
