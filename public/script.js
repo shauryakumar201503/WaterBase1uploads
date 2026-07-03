@@ -1,11 +1,10 @@
 // ----------------------
-// UPLOAD SYSTEM (WORKING)
+// UPLOAD SYSTEM (FINAL)
 // ----------------------
 function uploadFile() {
   const file = document.getElementById("fileInput").files[0];
   const password = document.getElementById("passwordInput").value;
   const username = document.getElementById("usernameInput").value;
-  const siteName = document.getElementById("siteNameInput").value;
 
   if (!file) {
     document.getElementById("result").innerHTML = "Please select a file.";
@@ -16,7 +15,6 @@ function uploadFile() {
   formData.append("file", file);
   formData.append("password", password);
   formData.append("username", username);
-  formData.append("siteName", siteName);
 
   fetch("/upload", {
     method: "POST",
@@ -35,14 +33,14 @@ function uploadFile() {
 
 
 // ----------------------
-// UNLOCK SYSTEM (FIXED)
+// UNLOCK SYSTEM (FINAL)
 // ----------------------
 function unlock() {
   const password = document.getElementById("unlockPass").value;
 
-  // NEW: Extract ID from URL
+  // Extract ID from URL: /file/<id>/<filename>/<username>/<uploadNumber>/developershauryakumar
   const parts = window.location.pathname.split("/");
-  const id = parts[2]; // URL: /file/<id>/<filename>/<username>/<uploadNumber>/developershauryakumar
+  const id = parts[2];
 
   fetch("/unlock/" + id, {
     method: "POST",
@@ -52,7 +50,10 @@ function unlock() {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      window.location.href = "/download/" + id;
+      document.getElementById("msg").innerHTML = "Unlocked! Redirecting...";
+      setTimeout(() => {
+        window.location.href = "/download/" + id;
+      }, 800);
     } else {
       document.getElementById("msg").innerHTML = data.message;
     }
