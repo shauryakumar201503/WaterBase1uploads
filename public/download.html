@@ -9,6 +9,14 @@
 
   <button id="downloadBtn">Download File</button>
 
-  <script src="/script.js"></script>
+  <script>
+    // Extract ID from URL: /download/<id>
+    const parts = window.location.pathname.split("/");
+    const id = parts[2]; // because URL is /download/<id>
+
+    document.getElementById("downloadBtn").onclick = function () {
+      window.location.href = "/download/" + id;
+    };
+  </script>
 </body>
 </html>
