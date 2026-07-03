@@ -23,8 +23,18 @@ function uploadFile() {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
+      const fullURL = window.location.origin + data.url;
+
+      // Show URL + GET button
       document.getElementById("result").innerHTML =
-        "Your special URL:<br>" + window.location.origin + data.url;
+        "Your special URL:<br>" + fullURL +
+        "<br><br><button id='getBtn'>GET</button>";
+
+      // GET button opens unlock page
+      document.getElementById("getBtn").onclick = () => {
+        window.open(fullURL, "_blank");
+      };
+
     } else {
       document.getElementById("result").innerHTML = data.message;
     }
