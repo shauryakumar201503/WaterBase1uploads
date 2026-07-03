@@ -8,10 +8,35 @@
   <h1>Enter Password</h1>
 
   <input type="password" id="unlockPass" placeholder="Password"><br>
-  <button onclick="unlock()">Unlock</button>
+  <button id="unlockBtn">Unlock</button>
 
   <p id="msg"></p>
 
-  <script src="/script.js"></script>
+  <script>
+    // Extract ID from URL: /file/<id>/<filename>/<username>/<uploadNumber>/developershauryakumar
+    const parts = window.location.pathname.split("/");
+    const id = parts[2]; // because URL is /file/<id>/...
+
+    document.getElementById("unlockBtn").onclick = async function () {
+      const password = document.getElementById("unlockPass").value;
+
+      const response = await fetch("/unlock/" + id, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        document.getElementById("msg").innerText = "Unlocked! Redirecting...";
+        setTimeout(() => {
+          window.location.href = "/download/" + id;
+        }, 1000);
+      } else {
+        document.getElementById("msg").innerText = result.message;
+      }
+    };
+  </script>
 </body>
 </html>
