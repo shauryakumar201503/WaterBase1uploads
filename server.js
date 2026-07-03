@@ -6,19 +6,20 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-const uploadFolder = path.join(__dirname, "uploads");
+// CHANGE 1: uploads → download
+const uploadFolder = path.join(__dirname, "download");
 if (!fs.existsSync(uploadFolder)) {
   fs.mkdirSync(uploadFolder);
 }
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    // CHANGE 2: uploads → download
     cb(null, uploadFolder);
   },
   filename: (req, file, cb) => {
@@ -105,6 +106,7 @@ app.get("/download/:id", (req, res) => {
     return res.send("You must unlock the file first");
   }
 
+  // CHANGE 3: uploads → download
   const filePath = path.join(uploadFolder, data[id].filename);
   res.download(filePath, data[id].originalName);
 });
