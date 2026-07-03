@@ -47,10 +47,10 @@ function saveData(data) {
 
 // UPLOAD ROUTE
 app.post("/upload", upload.single("file"), (req, res) => {
-  const { password, username, siteName } = req.body;
+  const { password, username } = req.body;
   const file = req.file;
 
-  if (!file || !password || !username || !siteName) {
+  if (!file || !password || !username) {
     return res.json({ success: false, message: "Missing fields" });
   }
 
@@ -63,7 +63,6 @@ app.post("/upload", upload.single("file"), (req, res) => {
     originalName: file.originalname,
     password,
     username,
-    siteName,
     uploadNumber,
     unlocked: false
   };
