@@ -1,8 +1,16 @@
+// ----------------------
+// UPLOAD SYSTEM (WORKING)
+// ----------------------
 function uploadFile() {
   const file = document.getElementById("fileInput").files[0];
   const password = document.getElementById("passwordInput").value;
   const username = document.getElementById("usernameInput").value;
   const siteName = document.getElementById("siteNameInput").value;
+
+  if (!file) {
+    document.getElementById("result").innerHTML = "Please select a file.";
+    return;
+  }
 
   const formData = new FormData();
   formData.append("file", file);
@@ -25,21 +33,16 @@ function uploadFile() {
   });
 }
 
+
+// ----------------------
+// UNLOCK SYSTEM (FIXED)
+// ----------------------
 function unlock() {
   const password = document.getElementById("unlockPass").value;
 
+  // NEW: Extract ID from URL
   const parts = window.location.pathname.split("/");
-  const filename = parts[2];
-  const username = parts[3];
-  const uploadNumber = parts[4];
-
-  const data = JSON.parse(localStorage.getItem("waterbaseData") || "{}");
-
-  const id = Object.keys(data).find(key => {
-    return data[key].filename === filename &&
-           data[key].username === username &&
-           data[key].uploadNumber.toString() === uploadNumber;
-  });
+  const id = parts[2]; // URL: /file/<id>/<filename>/<username>/<uploadNumber>/developershauryakumar
 
   fetch("/unlock/" + id, {
     method: "POST",
@@ -56,6 +59,10 @@ function unlock() {
   });
 }
 
+
+// ----------------------
+// DOWNLOAD PAGE SUPPORT
+// ----------------------
 window.onload = () => {
   if (window.location.pathname.startsWith("/download/")) {
     const id = window.location.pathname.split("/")[2];
