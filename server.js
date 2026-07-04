@@ -33,7 +33,10 @@ const upload = multer({ storage });
 // Data file
 const DATA_FILE = path.join(__dirname, "data.json");
 
-// Load and save data
+// Websites file
+const WEBSITES_FILE = path.join(__dirname, "websites.json");
+
+// Load and save data.json
 function loadData() {
   if (!fs.existsSync(DATA_FILE)) {
     fs.writeFileSync(DATA_FILE, "{}");
@@ -43,6 +46,18 @@ function loadData() {
 
 function saveData(data) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+}
+
+// Load and save websites.json
+function loadWebsites() {
+  if (!fs.existsSync(WEBSITES_FILE)) {
+    fs.writeFileSync(WEBSITES_FILE, "[]");
+  }
+  return JSON.parse(fs.readFileSync(WEBSITES_FILE));
+}
+
+function saveWebsites(data) {
+  fs.writeFileSync(WEBSITES_FILE, JSON.stringify(data, null, 2));
 }
 
 // UPLOAD ROUTE
@@ -72,6 +87,27 @@ app.post("/upload", upload.single("file"), (req, res) => {
   // FINAL URL FORMAT WITH ID INCLUDED
   const specialURL =
     `/file/${id}/${file.filename}/${username}/${uploadNumber}/developershauryakumar`;
+
+  // ⭐ NEW FEATURE: SAVE WEBSITE NAME + URL IN websites.json
+  const websites = loadWebsites();
+
+  // Find user entry
+  let userEntry = websites.find(u => u.Username === username);
+
+  if (!userEntry) {
+    // Create new user entry
+    userEntry = {
+      Username: username,
+      urls: []
+    };
+    websites.push(userEntry);
+  }
+
+  // Add new website URL
+  userEntry.urls.push(`waterbase1.com/${username}/${uploadNumber}`);
+
+  // Save updated websites.json
+  saveWebsites(websites);
 
   res.json({ success: true, url: specialURL });
 });
