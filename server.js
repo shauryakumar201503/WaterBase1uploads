@@ -12,6 +12,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+
+// ⭐⭐⭐ IMPORT BACKEND.JS HERE ⭐⭐⭐
+const accounts = require("./backend.js");
+app.use("/", accounts);
+// This makes all account routes work:
+// /create-account-final
+// /verify-code
+// /login
+// /dashboard-info
+
+
+
 // Use "download" folder for file storage
 const uploadFolder = path.join(__dirname, "download");
 if (!fs.existsSync(uploadFolder)) {
@@ -60,6 +72,8 @@ function saveWebsites(data) {
   fs.writeFileSync(WEBSITES_FILE, JSON.stringify(data, null, 2));
 }
 
+
+
 // UPLOAD ROUTE
 app.post("/upload", upload.single("file"), (req, res) => {
   const { password, username } = req.body;
@@ -84,18 +98,14 @@ app.post("/upload", upload.single("file"), (req, res) => {
 
   saveData(data);
 
-  // FINAL URL FORMAT WITH ID INCLUDED
   const specialURL =
     `/file/${id}/${file.filename}/${username}/${uploadNumber}/developershauryakumar`;
 
-  // ⭐ NEW FEATURE: SAVE WEBSITE NAME + URL IN websites.json
   const websites = loadWebsites();
 
-  // Find user entry
   let userEntry = websites.find(u => u.Username === username);
 
   if (!userEntry) {
-    // Create new user entry
     userEntry = {
       Username: username,
       urls: []
@@ -103,14 +113,14 @@ app.post("/upload", upload.single("file"), (req, res) => {
     websites.push(userEntry);
   }
 
-  // Add new website URL
   userEntry.urls.push(`waterbase1.com/${username}/${uploadNumber}`);
 
-  // Save updated websites.json
   saveWebsites(websites);
 
   res.json({ success: true, url: specialURL });
 });
+
+
 
 // UNLOCK PAGE ROUTE
 app.get("/file/:id/:filename/:username/:uploadNumber/developershauryakumar", (req, res) => {
