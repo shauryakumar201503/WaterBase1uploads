@@ -1,0 +1,75 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #4a6cff, #1a2a6c);
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+.container {
+    width: 100%;
+    text-align: center;
+    margin-top: 70px;
+}
+
+.header-box {
+    background-color: #2e5cff;
+    padding: 20px;
+    width: 60%;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0px 0px 10px rgba(255,255,255,0.3);
+}
+
+.header-box h1 {
+    margin: 0;
+    font-size: 36px;
+}
+
+.code-box {
+    margin-top: 60px;
+}
+
+#codeInput {
+    padding: 18px;
+    font-size: 28px;
+    width: 200px;
+    text-align: center;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}
+
+.button-row {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.nav-btn {
+    background-color: #2e5cff;
+    border: none;
+    padding: 15px 40px;
+    font-size: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    color: white;
+    transition: 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: #1f3dcc;
+    transform: scale(1.05);
+}
+
+.info-box {
+    margin-top: 60px;
+    background-color: rgba(0,0,0,0.3);
+    padding: 20px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 20px;
+    font-size: 20px;
+}
