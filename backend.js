@@ -4,8 +4,8 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 
-const app = express();
-app.use(bodyParser.json());
+const router = express.Router();
+router.use(bodyParser.json());
 
 // Paths
 const usersFile = path.join(__dirname, "users.json");
@@ -42,17 +42,16 @@ function readData() {
 }
 
 // ---------- Email (App Password) ----------
-// Put your real Gmail + app password here
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "RoboverseEntertainment@gmail.com",   // YOUR GMAIL
-        pass: "nzjl ztxm eike ilvp"             // YOUR APP PASSWORD
+        user: "RoboverseEntertainment@gmail.com",
+        pass: "nzjl ztxm eike ilvp"
     }
 });
 
 // ---------- POST /create-account-final ----------
-app.post("/create-account-final", (req, res) => {
+router.post("/create-account-final", (req, res) => {
     const { gmail, username, password } = req.body;
 
     let users = readUsers();
@@ -75,7 +74,6 @@ app.post("/create-account-final", (req, res) => {
     users.push(newUser);
     writeUsers(users);
 
-    // Send verification code email using app password
     const mailOptions = {
         from: "roboverseentertainment@gmail.com",
         to: gmail,
@@ -95,7 +93,7 @@ app.post("/create-account-final", (req, res) => {
 });
 
 // ---------- POST /verify-code ----------
-app.post("/verify-code", (req, res) => {
+router.post("/verify-code", (req, res) => {
     const { gmail, code } = req.body;
 
     const users = readUsers();
@@ -115,7 +113,7 @@ app.post("/verify-code", (req, res) => {
 });
 
 // ---------- POST /login ----------
-app.post("/login", (req, res) => {
+router.post("/login", (req, res) => {
     const { username, password } = req.body;
 
     const users = readUsers();
@@ -136,7 +134,7 @@ app.post("/login", (req, res) => {
 });
 
 // ---------- POST /dashboard-info ----------
-app.post("/dashboard-info", (req, res) => {
+router.post("/dashboard-info", (req, res) => {
     const { username } = req.body;
 
     const users = readUsers();
@@ -149,7 +147,6 @@ app.post("/dashboard-info", (req, res) => {
     const allWebsites = readWebsites();
     const allData = readData();
 
-    // Filter stats for this user if you store username in those files
     const userWebsites = allWebsites.filter(w => w.username === username);
     const userUploads = allData.filter(d => d.username === username);
 
@@ -158,15 +155,10 @@ app.post("/dashboard-info", (req, res) => {
         gmail: user.gmail,
         uploads: userUploads.length,
         websites: userWebsites.length,
-        storage: `${userUploads.length * 5} MB` // example: 5MB per file
+        storage: `${userUploads.length * 5} MB`
     };
 
     res.json(info);
 });
 
-// ---------- Start backend ----------
-const PORT = 4000;
-app.listen(PORT, () => {
-    console.log("Accounts backend running on port", PORT);
-});
-
+module.exports = router;
