@@ -41,12 +41,12 @@ function readData() {
     return safeReadJSON(dataFile, []);
 }
 
-// ---------- Email (App Password) ----------
+// ---------- Email (App Password via Render ENV) ----------
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "RoboverseEntertainment@gmail.com",
-        pass: "nzjl ztxm eike ilvp"
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
@@ -75,7 +75,7 @@ router.post("/create-account-final", (req, res) => {
     writeUsers(users);
 
     const mailOptions = {
-        from: "roboverseentertainment@gmail.com",
+        from: process.env.EMAIL_USER,
         to: gmail,
         subject: "Your WaterBase Verification Code",
         text: `Your 5-digit verification code is: ${verificationCode}`
